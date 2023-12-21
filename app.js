@@ -89,7 +89,7 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
 // Verificación de credenciales en MySQL
-    const query = 'SELECT * FROM users WHERE username = ? AND password =?';
+    const query = 'SELECT * FROM Users WHERE username = ? AND password =?';
     db.query(query, [username, password], (err, results) => {
         if (err) {
             console.error('Error al verificar las credenciales:', err);

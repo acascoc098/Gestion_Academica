@@ -60,30 +60,39 @@ Create TABLE Users(
     password VARCHAR(30)
 );
 
-CREATE TRIGGER before_insert_alumno_asignatura
-BEFORE INSERT ON alumno_asignatura
-FOR EACH ROW
-BEGIN
-    DECLARE alumno_count INT;
-    SET alumno_count = (SELECT COUNT(*) FROM alumno_asignatura WHERE asignatura = NEW.asignatura);
-    
-    IF alumno_count > 32 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No se puede asignar más de 32 alumnos a la asignatura';
-    END IF;
-END;
+INSERT INTO `Users` (`username`, `password`) VALUES ('pepe', 'Secreto_123');
 
-INSERT INTO `Users` (`username`, `password`) VALUES ('pepe','Secreto_123')
+ DELIMITER //
 
-CREATE TRIGGER before_update_alumno_asignatura
-BEFORE UPDATE ON alumno_asignatura
-FOR EACH ROW
-BEGIN
-    DECLARE alumno_count INT;
-    SET alumno_count = (SELECT COUNT(*) FROM alumno_asignatura WHERE asignatura = NEW.asignatura);
+ CREATE TRIGGER before_insert_alumno_asignatura
+ BEFORE INSERT ON Matricula
+ FOR EACH ROW
+ BEGIN
+ DECLARE alumno_count INT;
+ SET alumno_count = (SELECT COUNT(*) FROM Matricula WHERE
+id_asignatura = NEW.id_asignatura);
+ IF alumno_count > 32 THEN
+ SIGNAL SQLSTATE '45000'
+ SET MESSAGE_TEXT = 'No se puede asignar más de 32 alumnos a la
+asignatura';
+ END IF;
+ END;
+ //
 
-    IF alumno_count > 32 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No se puede asignar más de 32 alumnos a la asignatura';
-    END IF;
-END;
+ DELIMITER //
+  CREATE TRIGGER before_update_alumno_asignatura
+ BEFORE UPDATE ON Matricula
+ FOR EACH ROW
+ BEGIN
+ DECLARE alumno_count INT;
+ SET alumno_count = (SELECT COUNT(*) FROM Matricula WHERE
+id_asignatura = NEW.id_asignatura);
+ IF alumno_count > 32 THEN
+ SIGNAL SQLSTATE '45000'
+ SET MESSAGE_TEXT = 'No se puede asignar más de 32 alumnos a la
+asignatura';
+ END IF;
+ END;
+ //
+
+ DELIMITER ;
