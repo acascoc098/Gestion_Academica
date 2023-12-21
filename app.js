@@ -57,6 +57,16 @@ app.use((req, res, next) => {
     }
 });
 
+// Middleware para gestionar la sesión de usuario
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    if (!req.session.user && !req.path.match("/login"))
+        res.redirect("/login")
+    else
+        next();
+});
+    
+
 // Ruta por defecto
 app.get('/', (req,res) => {
     res.render('index', { user: req.session.user});
@@ -67,3 +77,55 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
+// Verificación de credenciales en MySQL
+const query = 'SELECT * FROM users WHERE username = ? AND password =?';
+db.query(query, [username, password], (err, results) => {
+    if (err) {
+        console.error('Error al verificar las credenciales:', err);
+        res.render("error", {mensaje: "Credenciales no válidas."});
+    } else {
+        if (results.length > 0) {
+            req.session.user = username;
+            res.redirect('/');
+        } else {
+            res.redirect('/login');
+        }
+    }
+});
+
+
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+    if (err) res.render("error", {mensaje: err});
+    else res.redirect('/login');
+    });
+});
+
+app.post('/login', (req, res) => {
+const { username, password } = req.body;
+
+// Verificación de credenciales en MySQL
+const query = 'SELECT * FROM users WHERE username = ? AND password =?';
+db.query(query, [username, password], (err, results) => {
+    if (err) {
+        console.error('Error al verificar las credenciales:', err);
+        res.render("error", {mensaje: "Credenciales no válidas."});
+    } else {
+        if (results.length > 0) {
+            req.session.user = username;
+            res.redirect('/');
+        } else {
+            res.redirect('/login');
+        }
+    }
+    });
+});
+
+app.get('/error', (req, res) => {
+    res.render('error');
+});    
+
+// Iniciar el servidor
+app.listen(port, () => {
+    console.log(`Servidor iniciado en http://localhost:${port}`);
+});
