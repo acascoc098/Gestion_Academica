@@ -9,7 +9,7 @@ const port = 8000;
 
 const db = mysql.createConnection({
     host: 'localhost',
-    port: 33306,
+    port: 33308,
     user: 'root',
     password: 's83n38DGB8d72',
     database: 'gestion',
@@ -43,7 +43,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true}));
 
 //Middleware para gestionar la sesion de usuario
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     if(req.session.user===undefined){ 
         if (req.path.startsWith("/error")){
@@ -55,7 +55,15 @@ app.use((req, res, next) => {
     }else{
         next();
     }
+});*/
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    if (!req.session.user && !req.path.match("/login"))
+        res.redirect("/login")
+    else
+        next();
 });
+    
 
 // Middleware para gestionar la sesión de usuario
 app.use((req, res, next) => {
