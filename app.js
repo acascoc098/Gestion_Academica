@@ -119,7 +119,7 @@ app.get('/error', (req, res) => {
 // Rutas
 app.get('/alumnos', (req, res) => {
     // Obtener todos los alumnos de la base de datos
-    db.query('SELECT * FROM alumno', (err, result) => {
+    db.query('SELECT * FROM Alumnos', (err, result) => {
         if (err) res.render("error", {mensaje: err});
         else res.render('alumnos', { alumnos: result });
     });
@@ -132,7 +132,7 @@ app.get('/alumnos-add', (req, res) => {
 app.post('/alumnos-add', (req, res) => {
 // Insertar un nuevo alumno en la base de datos
     const { nombre, apellido } = req.body;
-    db.query('INSERT INTO alumno (nombre, apellido) VALUES (?, ?)', [nombre, apellido], (err, result) => {
+    db.query('INSERT INTO Alumnos (nombre, apellido) VALUES (?, ?)', [nombre, apellido], (err, result) => {
         if (err) res.render("error", {mensaje: err});
         else res.redirect('/alumnos');
     });
@@ -142,7 +142,7 @@ app.get('/alumnos-edit/:id', (req, res) => {
 
     const alumnoId = req.params.id;
     // Obtener un alumno por su ID
-    db.query('SELECT * FROM alumno WHERE id = ?', [alumnoId], (err, result) => {
+    db.query('SELECT * FROM Alumnos WHERE id = ?', [alumnoId], (err, result) => {
         if (err) res.render("error", {mensaje: err});
         else{
             if (resylt.length>0) {
@@ -159,7 +159,7 @@ app.post('/alumnos-edit/:id', (req, res) => {
     const alumnoId = req.params.id;
     // Actualizar un alumno por su ID
     const { nombre, apellido } = req.body;
-    db.query('UPDATE alumno SET nombre = ?, apellido = ? WHERE id = ?', [nombre, apellido, alumnoId], (err, result) => {
+    db.query('UPDATE Alumnos SET nombre = ?, apellido = ? WHERE id = ?', [nombre, apellido, alumnoId], (err, result) => {
         if (err)
         res.render("error", {mensaje: err});
         else
