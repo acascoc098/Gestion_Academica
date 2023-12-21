@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    h1 Agregar Alumno
+    form(action='/alumnos-add', method='post')
+        label(for='nombre') Nombre:
+        input(type='text', id='nombre', name='nombre', required=true)
+        br
+        label(for='apellido') Apellido:
+        input(type='text', id='apellido', name='apellido', required=true)
+        br
+        button(type='submit') Agregar Alumno
+    br
+    a(href='/') Volver a la Lista

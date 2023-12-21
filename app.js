@@ -9,7 +9,7 @@ const port = 8000;
 
 const db = mysql.createConnection({
     host: 'localhost',
-    port: 33308,
+    port: 33306,
     user: 'root',
     password: 's83n38DGB8d72',
     database: 'gestion',
@@ -77,22 +77,25 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
-// Verificación de credenciales en MySQL
-const query = 'SELECT * FROM users WHERE username = ? AND password =?';
-db.query(query, [username, password], (err, results) => {
-    if (err) {
-        console.error('Error al verificar las credenciales:', err);
-        res.render("error", {mensaje: "Credenciales no válidas."});
-    } else {
-        if (results.length > 0) {
-            req.session.user = username;
-            res.redirect('/');
-        } else {
-            res.redirect('/login');
-        }
-    }
-});
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
 
+// Verificación de credenciales en MySQL
+    const query = 'SELECT * FROM users WHERE username = ? AND password =?';
+    db.query(query, [username, password], (err, results) => {
+        if (err) {
+            console.error('Error al verificar las credenciales:', err);
+            res.render("error", {mensaje: "Credenciales no válidas."});
+        } else {
+            if (results.length > 0) {
+                req.session.user = username;
+                res.redirect('/');
+            } else {
+                res.redirect('/login');
+            }
+        }
+    });
+});
 
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -101,29 +104,62 @@ app.get('/logout', (req, res) => {
     });
 });
 
-app.post('/login', (req, res) => {
-const { username, password } = req.body;
-
-// Verificación de credenciales en MySQL
-const query = 'SELECT * FROM users WHERE username = ? AND password =?';
-db.query(query, [username, password], (err, results) => {
-    if (err) {
-        console.error('Error al verificar las credenciales:', err);
-        res.render("error", {mensaje: "Credenciales no válidas."});
-    } else {
-        if (results.length > 0) {
-            req.session.user = username;
-            res.redirect('/');
-        } else {
-            res.redirect('/login');
-        }
-    }
-    });
-});
-
 app.get('/error', (req, res) => {
     res.render('error');
 });    
+
+// Rutas
+app.get('/alumnos', (req, res) => {
+    // Obtener todos los alumnos de la base de datos
+    db.query('SELECT * FROM alumno', (err, result) => {
+        if (err) res.render("error", {mensaje: err});
+        else res.render('alumnos', { alumnos: result });
+    });
+});
+
+app.get('/alumnos-add', (req, res) => {
+    res.render('alumnos-add');
+});
+
+app.post('/alumnos-add', (req, res) => {
+// Insertar un nuevo alumno en la base de datos
+    const { nombre, apellido } = req.body;
+    db.query('INSERT INTO alumno (nombre, apellido) VALUES (?, ?)', [nombre, apellido], (err, result) => {
+        if (err) res.render("error", {mensaje: err});
+        else res.redirect('/alumnos');
+    });
+});
+
+app.get('/alumnos-edit/:id', (req, res) => {
+
+    const alumnoId = req.params.id;
+    // Obtener un alumno por su ID
+    db.query('SELECT * FROM alumno WHERE id = ?', [alumnoId], (err, result) => {
+        if (err) res.render("error", {mensaje: err});
+        else{
+            if (resylt.length>0) {
+                res.render('alumnos-edit', { alumno: result[0] });
+            }else{
+                res.render('error',{mensaje: 'El alumno no existe'})
+            }
+        }
+    });
+});
+
+app.post('/alumnos-edit/:id', (req, res) => {
+
+    const alumnoId = req.params.id;
+    // Actualizar un alumno por su ID
+    const { nombre, apellido } = req.body;
+    db.query('UPDATE alumno SET nombre = ?, apellido = ? WHERE id = ?', [nombre, apellido, alumnoId], (err, result) => {
+        if (err)
+        res.render("error", {mensaje: err});
+        else
+        res.redirect('/alumnos');
+    });
+});
+    
+    
 
 // Iniciar el servidor
 app.listen(port, () => {

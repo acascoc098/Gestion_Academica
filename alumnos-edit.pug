@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    h1 Editar Alumno
+    form(action=`/alumnos-edit/${alumno.id}`, method='post')
+        label(for='nombre') Nombre:
+        input.form-control(type='text', id='nombre', name='nombre', value=
+            alumno.nombre, required=true)
+        br
+        label(for='apellido') Apellido:
+        input.form-control(type='text', id='apellido', name='apellido',
+            value=alumno.apellido, required=true)
+        br
+        button(type='submit') Guardar Cambios
+        br
+    a(href='/alumnos') Volver a la Lista

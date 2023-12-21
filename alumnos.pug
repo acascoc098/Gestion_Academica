@@ -1,0 +1,23 @@
+extends layout
+
+block content
+    h1 Lista de Alumnos
+    table
+        thead
+            tr
+                th ID
+                th Nombre
+                th Apellido
+                th Acciones
+            tbody
+                each alumno in alumnos
+                    tr
+                    td= alumno.id
+                    td= alumno.nombre
+                    td= alumno.apellido
+                    td
+                        a(href=`/alumnos-edit/${alumno.id}`) Editar
+                        span |
+                        a(href=`/alumnos-delete/${alumno.id}`) Eliminar
+    p
+    a(href='/alumnos-add') Agregar Nuevo Alumno
