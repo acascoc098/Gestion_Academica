@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h1 Gestión de asignaturas
+
+  h2 Matricular Alumnos en Asignaturas
+  form(action="/matricular", method="post")
+    label(for="alumno") Selecciona un alumno:
+    select(name="alumno" id="alumno")
+      each alumno in alumnos
+        option(value=alumno.id)= `${alumno.nombre} ${alumno.apellido}`
+
+    label(for="asignatura") Selecciona una asignatura:
+    select(name="asignatura" id="asignatura")
+      each asignatura in asignaturas
+        option(value=asignatura.id)= asignatura.nombre
+
+    button(type="submit") Matricular
+
+  hr
+
+  h2 Maestro detalle: Alumnos matriculados de una asignatura
+  label(for="alumnoAsignaturas") Selecciona un alumno para ver sus asignaturas matriculadas:
+  select(name="alumnoAsignaturas" id="alumnoAsignaturas" onchange="location = '/asignaturas/' + this.value;")
+    option
+    each alumno in alumnos
+      option(value=alumno.id)= `${alumno.nombre} ${alumno.apellido}`
