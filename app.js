@@ -167,6 +167,28 @@ app.post('/alumnos-edit/:id', (req, res) => {
     });
 });
     
+app.get('/alumnos-delete/:id', (req, res) => {
+    const alumnoId = req.params.id;
+    // Obtener y mostrar el alumno a eliminar
+    db.query('SELECT * FROM alumno WHERE id = ?', [alumnoId], (err,result) => {
+    if (err)
+        res.render("error", {mensaje: err});
+    else
+        res.render('alumnos-delete', { alumno: result[0] });
+    });
+
+});
+
+app.post('/alumnos-delete/:id', (req, res) => {
+    const alumnoId = req.params.id;
+    // Eliminar un alumno por su ID
+    db.query('DELETE FROM alumno WHERE id = ?', [alumnoId], (err,result) => {
+    if (err)
+        res.render("error", {mensaje: err});
+    else
+        res.redirect('/alumnos');
+    });
+});
     
 
 // Iniciar el servidor
