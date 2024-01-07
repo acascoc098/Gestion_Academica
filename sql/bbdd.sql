@@ -96,3 +96,33 @@ asignatura';
  //
 
  DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER before_insert_profesor_asignatura
+BEFORE INSERT ON Imparte
+FOR EACH ROW
+BEGIN
+DECLARE profesor_count INT;
+SET profesor_count = (SELECT COUNT(*) FROM Imparte WHERE id_asignatura = NEW.id_asignatura);
+IF profesor_count > 5 THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'No se puede asignar más de 5 profesores a la asignatura';
+END IF;
+END;
+//
+
+CREATE TRIGGER before_update_profesor_asignatura
+BEFORE UPDATE ON Imparte
+FOR EACH ROW
+BEGIN
+DECLARE profesor_count INT;
+SET profesor_count = (SELECT COUNT(*) FROM Imparte WHERE id_asignatura = NEW.id_asignatura);
+IF profesor_count > 5 THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'No se puede asignar más de 5 profesores a la asignatura';
+END IF;
+END;
+//
+
+DELIMITER ;
