@@ -284,14 +284,14 @@ app.post('/matricular', (req, res) => {
   const { alumno, asignatura } = req.body;
 
   // Verificar si la matrícula ya existe
-  const queryExistencia = 'SELECT * FROM alumno_asignatura WHERE Alumnos = ? AND Asignaturas = ?';
+  const queryExistencia = 'SELECT * FROM Matricula WHERE Alumnos = ? AND Asignaturas = ?';
   
   db.query(queryExistencia, [alumno, asignatura], (errExistencia, resultExistencia) => {
     if (errExistencia) throw errExistencia;
 
     if (resultExistencia.length === 0) {
       // Matricular al alumno en la asignatura
-      const queryMatricular = 'INSERT INTO alumno_asignatura (Alumnos, Asignaturas) VALUES (?, ?)';
+      const queryMatricular = 'INSERT INTO Matricula (Alumnos, Asignaturas) VALUES (?, ?)';
       
       db.query(queryMatricular, [alumno, asignatura], (errMatricular) => {
         if (errMatricular) throw errMatricular;
@@ -311,10 +311,10 @@ app.get('/asignaturas/:alumnoId', (req, res) => {
   // Obtener asignaturas matriculadas para el alumno seleccionado
   const queryAsignaturasMatriculadas = `
     SELECT Asignaturas.nombre as asignatura, Alumnos.*
-    FROM Asignaturas, Alumnos, alumno_asignatura
-    WHERE alumno_asignatura.Alumnos = ?
-    AND Asignaturas.id = alumno_asignatura.Asignaturas
-    AND Alumnos.id = alumno_asignatura.Alumnos;`;
+    FROM Asignaturas, Alumnos, Matricula
+    WHERE Matricula.Alumnos = ?
+    AND Asignaturas.id = Matricula.Asignaturas
+    AND Alumnos.id = Matricula.Alumnos;`;
 
   db.query(queryAsignaturasMatriculadas, [alumnoId], (err, result) => {
     if (err) res.render('error', { mensaje: err });
@@ -323,7 +323,7 @@ app.get('/asignaturas/:alumnoId', (req, res) => {
       db.query('select * from Alumnos where Alumnos.id=?', [alumnoId], (err, result) => {
         if (err) res.render('error', { mensaje: err });
         else
-          res.render('asignaturas-alumno', { alumno: result[0], asignaturasMatriculadas: asignaturas });
+          res.render('Matricula', { alumno: result[0], asignaturasMatriculadas: asignaturas });
       });
     }
   });
@@ -353,14 +353,14 @@ app.post('/matricular', (req, res) => {
   const { alumno, asignatura } = req.body;
 
   // Verificar si la matrícula ya existe
-  const queryExistencia = 'SELECT * FROM alumno_asignatura WHERE Alumnos = ? AND Asignaturas = ?';
+  const queryExistencia = 'SELECT * FROM Matricula WHERE Alumnos = ? AND Asignaturas = ?';
   
   db.query(queryExistencia, [alumno, asignatura], (errExistencia, resultExistencia) => {
     if (errExistencia) throw errExistencia;
 
     if (resultExistencia.length === 0) {
       // Matricular al alumno en la asignatura
-      const queryMatricular = 'INSERT INTO alumno_asignatura (Alumnos, Asignaturas) VALUES (?, ?)';
+      const queryMatricular = 'INSERT INTO Matricula (Alumnos, Asignaturas) VALUES (?, ?)';
       
       db.query(queryMatricular, [alumno, asignatura], (errMatricular) => {
         if (errMatricular) throw errMatricular;
@@ -380,10 +380,10 @@ app.get('/asignaturas/:alumnoId', (req, res) => {
   // Obtener asignaturas matriculadas para el alumno seleccionado
   const queryAsignaturasMatriculadas = `
     SELECT Asignaturas.nombre as asignatura, Alumnos.*
-    FROM Asignaturas, Alumnos, alumno_asignatura
-    WHERE alumno_asignatura.Alumnos = ?
-    AND Asignaturas.id = alumno_asignatura.Asignaturas
-    AND Alumnos.id = alumno_asignatura.Alumnos;`;
+    FROM Asignaturas, Alumnos, Matricula
+    WHERE Matricula.Alumnos = ?
+    AND Asignaturas.id = Matricula.Asignaturas
+    AND Alumnos.id = Matricula.Alumnos;`;
 
   db.query(queryAsignaturasMatriculadas, [alumnoId], (err, result) => {
     if (err) res.render('error', { mensaje: err });
@@ -392,7 +392,7 @@ app.get('/asignaturas/:alumnoId', (req, res) => {
       db.query('select * from Alumnos where Alumnos.id=?', [alumnoId], (err, result) => {
         if (err) res.render('error', { mensaje: err });
         else
-          res.render('asignaturas-alumno', { alumno: result[0], asignaturasMatriculadas: asignaturas });
+          res.render('Matricula', { alumno: result[0], asignaturasMatriculadas: asignaturas });
       });
     }
   });
