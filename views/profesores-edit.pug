@@ -1,24 +1,24 @@
 extends layout
 
 block content
-    h1 Editar Alumno
-    form(action=`/alumnos-edit/${alumno.id}`, method='post')
+    h1 Editar Profesor
+    form(action=`/profesores-edit/${profesor.id}`, method='post')
         label(for='nombre') Nombre:
         input.form-control(type='text', id='nombre', name='nombre', value=
-            alumno.nombre, required=true)
+            profesor.nombre, required=true)
         br
         label(for='apellido') Apellido:
         input.form-control(type='text', id='apellido', name='apellido',
-            value=alumno.apellido, required=true)
+            value=profesor.apellido, required=true)
         br
         label(for='email') Email:
         input.form-control(type='text', id='email', name='email',
-            value=alumno.email, required=true)
+            value=profesor.email, required=true)
         br
-        label(for='telefono') Telefono:
+        label(for='telefono') Teléfono:
         input.form-control(type='text', id='telefono', name='telefono',
-            value=alumno.telefono, required=true)
+            value=profesor.telefono, required=true)
         br
         button(type='submit') Guardar Cambios
         br
-    a(href='/alumnos') Volver a la Lista
+    a(href='/profesores') Volver a la Lista

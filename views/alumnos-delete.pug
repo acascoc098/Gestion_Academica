@@ -6,6 +6,8 @@ block content
     ul
         li Nombre: #{alumno.nombre}
         li Apellido: #{alumno.apellido}
+        li Email: #{alumno.email}
+        li Telefono: #{alumno.telefono}
     form(action=`/alumnos-delete/${alumno.id}`, method='post')
     button(type='submit') Eliminar Alumno
     br
