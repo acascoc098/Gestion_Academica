@@ -5,16 +5,19 @@ block content
     table
         thead
             tr
-                th ID
+                th DNI
                 th Nombre
                 th Apellido
-                th Acciones
+                th Email
+                th Telefono
             tbody
                 each alumno in alumnos
                     tr
-                    td= alumno.id
+                    td= alumno.dni
                     td= alumno.nombre
                     td= alumno.apellido
+                    td= alumno.email 
+                    td= alumno.telefono
                     td
                         a(href=`/alumnos-edit/${alumno.id}`) Editar
                         span |

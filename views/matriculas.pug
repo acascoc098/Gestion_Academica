@@ -20,8 +20,8 @@ block content
   hr
 
   h2 Maestro detalle: Alumnos matriculados de una asignatura
-  label(for="alumnoAsignaturas") Selecciona un alumno para ver sus asignaturas matriculadas:
-  select(name="alumnoAsignaturas" id="alumnoAsignaturas" onchange="location = '/asignaturas/' + this.value;")
+  label(for="Matricula") Selecciona un alumno para ver sus asignaturas matriculadas:
+  select(name="Matricula" id="Matricula" onchange="location = '/asignaturas/' + this.value;")
     option
     each alumno in alumnos
       option(value=alumno.id)= `${alumno.nombre} ${alumno.apellido}`

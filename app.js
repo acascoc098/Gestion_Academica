@@ -132,7 +132,7 @@ app.get('/alumnos-add', (req, res) => {
 app.post('/alumnos-add', (req, res) => {
 // Insertar un nuevo alumno en la base de datos
     const { nombre, apellido } = req.body;
-    db.query('INSERT INTO Alumnos (nombre, apellido) VALUES (?, ?)', [nombre, apellido], (err, result) => {
+    db.query('INSERT INTO Alumnos (nombre, apellido, email, telefono) VALUES (?, ?, ?, ?)', [nombre, apellido], (err, result) => {
         if (err) res.render("error", {mensaje: err});
         else res.redirect('/alumnos');
     });
@@ -142,7 +142,7 @@ app.get('/alumnos-edit/:id', (req, res) => {
 
     const alumnoId = req.params.id;
     // Obtener un alumno por su ID
-    db.query('SELECT * FROM Alumnos WHERE id = ?', [alumnoId], (err, result) => {
+    db.query('SELECT * FROM Alumnos WHERE dni = ?', [alumnoId], (err, result) => {
         if (err) res.render("error", {mensaje: err});
         else{
             if (resylt.length>0) {
@@ -154,12 +154,12 @@ app.get('/alumnos-edit/:id', (req, res) => {
     });
 });
 
-app.post('/alumnos-edit/:id', (req, res) => {
+app.post('/alumnos-edit/:dni', (req, res) => {
 
     const alumnoId = req.params.id;
     // Actualizar un alumno por su ID
     const { nombre, apellido } = req.body;
-    db.query('UPDATE Alumnos SET nombre = ?, apellido = ? WHERE id = ?', [nombre, apellido, alumnoId], (err, result) => {
+    db.query('UPDATE Alumnos SET nombre = ?, apellido = ?, email = ?, telefono = ? WHERE dni = ?', [nombre, apellido, alumnoId], (err, result) => {
         if (err)
         res.render("error", {mensaje: err});
         else
@@ -167,10 +167,10 @@ app.post('/alumnos-edit/:id', (req, res) => {
     });
 });
     
-app.get('/alumnos-delete/:id', (req, res) => {
+app.get('/alumnos-delete/:dni', (req, res) => {
     const alumnoId = req.params.id;
     // Obtener y mostrar el alumno a eliminar
-    db.query('SELECT * FROM Alumnos WHERE id = ?', [alumnoId], (err,result) => {
+    db.query('SELECT * FROM Alumnos WHERE dni = ?', [alumnoId], (err,result) => {
     if (err)
         res.render("error", {mensaje: err});
     else
@@ -179,10 +179,10 @@ app.get('/alumnos-delete/:id', (req, res) => {
 
 });
 
-app.post('/alumnos-delete/:id', (req, res) => {
+app.post('/alumnos-delete/:dni', (req, res) => {
     const alumnoId = req.params.id;
     // Eliminar un alumno por su ID
-    db.query('DELETE FROM Alumnos WHERE id = ?', [alumnoId], (err,result) => {
+    db.query('DELETE FROM Alumnos WHERE dni = ?', [alumnoId], (err,result) => {
     if (err)
         res.render("error", {mensaje: err});
     else
@@ -395,6 +395,76 @@ app.get('/asignaturas/:alumnoId', (req, res) => {
           res.render('Matricula', { alumno: result[0], asignaturasMatriculadas: asignaturas });
       });
     }
+  });
+});
+
+//- Ruta para mostrar todos los profesores
+app.get('/profesores', (req, res) => {
+  db.query('SELECT * FROM Profesores', (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else {
+      res.render("profesores", { profesores: result });
+    }
+  });
+});
+
+//- Ruta para mostrar el formulario de agregar profesores
+app.get('/profesores-add', (req, res) => {
+  res.render("profesores-add");
+});
+
+//- Ruta para agregar un nuevo profesor a la base de datos
+app.post('/profesores-add', (req, res) => {
+  const { nombre, especialidad } = req.body;
+  db.query('INSERT INTO Profesores (nombre, apellidos, email, telefono) VALUES (?, ?, ?, ?)', [nombre, especialidad], (err, result) => {
+    if (err) throw err;
+    res.redirect('/profesores');
+  });
+});
+
+//- Ruta para mostrar el formulario de editar un profesor específico
+app.get('/profesores-edit/:id', (req, res) => {
+  const profesorId = req.params.id;
+  db.query('SELECT * FROM Profesores WHERE dni = ?', [profesorId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.render("profesores-edit", { profesor: result[0] });
+  });
+});
+
+//- Ruta para actualizar un profesor por su ID
+app.post('/profesores-edit/:id', (req, res) => {
+  const profesorId = req.params.id;
+  const { nombre, especialidad } = req.body;
+  db.query('UPDATE Profesores SET nombre = ?, apellidos = ?, email = ?, telefono = ? WHERE dni = ?', [nombre, especialidad, profesorId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.redirect('/profesores');
+  });
+});
+
+//- Ruta para mostrar el formulario de eliminar un profesor específico
+app.get('/profesores-delete/:id', (req, res) => {
+  const profesorId = req.params.id;
+  db.query('SELECT * FROM Profesores WHERE dni = ?', [profesorId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.render('profesores-delete', { profesor: result[0] });
+  });
+});
+
+//- Ruta para eliminar un profesor por su ID
+app.post('/profesores-delete/:id', (req, res) => {
+  const profesorId = req.params.id;
+  db.query('DELETE FROM Profesores WHERE dni = ?', [profesorId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.redirect('/profesores');
   });
 });
 
