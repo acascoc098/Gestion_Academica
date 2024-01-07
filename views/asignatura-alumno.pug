@@ -3,7 +3,7 @@ extends layout
 block content
   h1 Asignaturas Matriculadas
 
-  h2 Alumno: #{alumno.nombre} #{alumno.apellido}
+  h2 Alumno: #{alumno.nombre} #{alumno.apellido} #{alumno.email} #{alumno.telefono}
 
   if asignaturasMatriculadas.length > 0
     ul

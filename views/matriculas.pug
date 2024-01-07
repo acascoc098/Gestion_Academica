@@ -8,7 +8,7 @@ block content
     label(for="alumno") Selecciona un alumno:
     select(name="alumno" id="alumno")
       each alumno in alumnos
-        option(value=alumno.id)= `${alumno.nombre} ${alumno.apellido}`
+        option(value=alumno.dni)= `${alumno.nombre} ${alumno.apellido} ${alumno.email} ${alumno.telefono}`
 
     label(for="asignatura") Selecciona una asignatura:
     select(name="asignatura" id="asignatura")
@@ -24,4 +24,4 @@ block content
   select(name="Matricula" id="Matricula" onchange="location = '/asignaturas/' + this.value;")
     option
     each alumno in alumnos
-      option(value=alumno.id)= `${alumno.nombre} ${alumno.apellido}`
+      option(value=alumno.id)= `${alumno.nombre} ${alumno.apellido} ${alumno.email} ${alumno.telefono}`

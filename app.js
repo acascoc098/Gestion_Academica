@@ -305,7 +305,7 @@ app.post('/matricular', (req, res) => {
   });
 });
 
-app.get('/asignaturas/:alumnoId', (req, res) => {
+app.get('/asignaturas/:alumnoDni', (req, res) => {
   const alumnoId = req.params.alumnoId;
 
   // Obtener asignaturas matriculadas para el alumno seleccionado
@@ -320,7 +320,7 @@ app.get('/asignaturas/:alumnoId', (req, res) => {
     if (err) res.render('error', { mensaje: err });
     else {
       const asignaturas = result;
-      db.query('select * from Alumnos where Alumnos.id=?', [alumnoId], (err, result) => {
+      db.query('select * from Alumnos where Alumnos.dni=?', [alumnoId], (err, result) => {
         if (err) res.render('error', { mensaje: err });
         else
           res.render('Matricula', { alumno: result[0], asignaturasMatriculadas: asignaturas });
@@ -467,6 +467,76 @@ app.post('/profesores-delete/:dni', (req, res) => {
       res.redirect('/profesores');
   });
 });
+
+// Rutas para profesores
+app.get('/impartir', (req, res) => {
+  // Obtener lista de profesores y asignaturas
+  const queryProfesores = 'SELECT * FROM Profesores';
+  const queryAsignaturas = 'SELECT * FROM Asignaturas';
+
+  db.query(queryProfesores, (errProfesores, resultProfesores) => {
+    if (errProfesores) throw errProfesores;
+
+    db.query(queryAsignaturas, (errAsignaturas, resultAsignaturas) => {
+      if (errAsignaturas) throw errAsignaturas;
+
+      res.render('impartir', {
+        profesores: resultProfesores,
+        asignaturas: resultAsignaturas,
+      });
+    });
+  });
+});
+
+app.post('/impartir', (req, res) => {
+  const { profesor, asignatura } = req.body;
+
+  // Verificar si la clase ya está siendo impartida por el profesor
+  const queryExistencia = 'SELECT * FROM Imparte WHERE Profesores = ? AND Asignaturas = ?';
+  
+  db.query(queryExistencia, [profesor, asignatura], (errExistencia, resultExistencia) => {
+    if (errExistencia) throw errExistencia;
+
+    if (resultExistencia.length === 0) {
+      // Asignar al profesor para impartir la clase en la asignatura
+      const queryImprimir = 'INSERT INTO Imparte (Profesores, Asignaturas) VALUES (?, ?)';
+      
+      db.query(queryImprimir, [profesor, asignatura], (errImprimir) => {
+        if (errImprimir) throw errImprimir;
+
+        res.redirect('/impartir');
+      });
+    } else {
+      // Clase ya está siendo impartida por el profesor
+      res.render('error', { mensaje: 'La clase ya está siendo impartida por el profesor' });
+    }
+  });
+});
+
+app.get('/asignaturas/:profesorDni', (req, res) => {
+  const profesorId = req.params.profesorId;
+
+  // Obtener asignaturas impartidas por el profesor seleccionado
+  const queryAsignaturasImpartidas = `
+    SELECT Asignaturas.nombre as asignatura, Profesores.*
+    FROM Asignaturas, Profesores, Imparte
+    WHERE Imparte.Profesores = ?
+    AND Asignaturas.id = Imparte.Asignaturas
+    AND Profesores.id = Imparte.Profesores;`;
+
+  db.query(queryAsignaturasImpartidas, [profesorId], (err, result) => {
+    if (err) res.render('error', { mensaje: err });
+    else {
+      const asignaturas = result;
+      db.query('select * from Profesores where Profesores.dni=?', [profesorId], (err, result) => {
+        if (err) res.render('error', { mensaje: err });
+        else
+          res.render('Imparte', { profesor: result[0], asignaturasImpartidas: asignaturas });
+      });
+    }
+  });
+});
+
 
 // Iniciar el servidor
 app.listen(port, () => {
