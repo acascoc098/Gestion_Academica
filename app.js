@@ -182,7 +182,7 @@ app.get('/alumnos-delete/:id', (req, res) => {
 app.post('/alumnos-delete/:id', (req, res) => {
     const alumnoId = req.params.id;
     // Eliminar un alumno por su ID
-    db.query('DELETE FROM alumno WHERE id = ?', [alumnoId], (err,result) => {
+    db.query('DELETE FROM Alumnos WHERE id = ?', [alumnoId], (err,result) => {
     if (err)
         res.render("error", {mensaje: err});
     else
@@ -190,6 +190,214 @@ app.post('/alumnos-delete/:id', (req, res) => {
     });
 });
     
+//- Ruta para mostrar todas las asignaturas
+app.get('/asignaturas', (req, res) => {
+    db.query('SELECT * FROM Asignaturas', (err, result) => {
+      if (err)
+        res.render("error", { mensaje: err });
+      else {
+        res.render("asignaturas", { asignaturas: result });
+      }
+    });
+  });
+  
+//- Ruta para mostrar el formulario de agregar asignaturas
+app.get('/asignaturas-add', (req, res) => {
+  res.render("asignaturas-add");
+});
+
+//- Ruta para agregar una nueva asignatura a la base de datos
+app.post('/asignaturas-add', (req, res) => {
+  const { nombre, ciclo, curso } = req.body;
+  db.query('INSERT INTO Asignaturas (nombre, ciclo, curso) VALUES (?, ?, ?)', [nombre, ciclo, curso], (err, result) => {
+    if (err) throw err;
+    res.redirect('/asignaturas');
+  });
+});
+
+//- Ruta para mostrar el formulario de editar una asignatura específica
+app.get('/asignaturas-edit/:id', (req, res) => {
+  const asignaturaId = req.params.id;
+  db.query('SELECT * FROM Asignaturas WHERE id = ?', [asignaturaId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.render("asignaturas-edit", { asignatura: result[0] });
+  });
+});
+
+//- Ruta para actualizar una asignatura por su ID
+app.post('/asignaturas-edit/:id', (req, res) => {
+  const asignaturaId = req.params.id;
+  const { nombre, ciclo, curso } = req.body;
+  db.query('UPDATE Asignaturas SET nombre = ?, ciclo = ?, curso = ? WHERE id = ?', [nombre, ciclo, curso, asignaturaId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.redirect('/asignaturas');
+  });
+});
+
+//- Ruta para mostrar el formulario de eliminar una asignatura específica
+app.get('/asignaturas-delete/:id', (req, res) => {
+  const asignaturaId = req.params.id;
+  db.query('SELECT * FROM Asignaturas WHERE id = ?', [asignaturaId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.render('asignaturas-delete', { asignatura: result[0] });
+  });
+});
+
+//- Ruta para eliminar una asignatura por su ID
+app.post('/asignaturas-delete/:id', (req, res) => {
+  const asignaturaId = req.params.id;
+  db.query('DELETE FROM Asignaturas WHERE id = ?', [asignaturaId], (err, result) => {
+    if (err)
+      res.render("error", { mensaje: err });
+    else
+      res.redirect('/asignaturas');
+  });
+});
+
+ // Rutas
+app.get('/matricular', (req, res) => {
+  // Obtener lista de alumnos y asignaturas
+  const queryAlumnos = 'SELECT * FROM alumno';
+  const queryAsignaturas = 'SELECT * FROM asignatura';
+
+  db.query(queryAlumnos, (errAlumnos, resultAlumnos) => {
+    if (errAlumnos) throw errAlumnos;
+
+    db.query(queryAsignaturas, (errAsignaturas, resultAsignaturas) => {
+      if (errAsignaturas) throw errAsignaturas;
+
+      res.render('matriculas', {
+        alumnos: resultAlumnos,
+        asignaturas: resultAsignaturas,
+      });
+    });
+  });
+});
+
+app.post('/matricular', (req, res) => {
+  const { alumno, asignatura } = req.body;
+
+  // Verificar si la matrícula ya existe
+  const queryExistencia = 'SELECT * FROM alumno_asignatura WHERE alumno = ? AND asignatura = ?';
+  
+  db.query(queryExistencia, [alumno, asignatura], (errExistencia, resultExistencia) => {
+    if (errExistencia) throw errExistencia;
+
+    if (resultExistencia.length === 0) {
+      // Matricular al alumno en la asignatura
+      const queryMatricular = 'INSERT INTO alumno_asignatura (alumno, asignatura) VALUES (?, ?)';
+      
+      db.query(queryMatricular, [alumno, asignatura], (errMatricular) => {
+        if (errMatricular) throw errMatricular;
+
+        res.redirect('/matricular');
+      });
+    } else {
+      // Matrícula ya existe
+      res.render('error', { mensaje: 'La matrícula ya existe' });
+    }
+  });
+});
+
+app.get('/asignaturas/:alumnoId', (req, res) => {
+  const alumnoId = req.params.alumnoId;
+
+  // Obtener asignaturas matriculadas para el alumno seleccionado
+  const queryAsignaturasMatriculadas = `
+    SELECT asignatura.nombre as asignatura, alumno.*
+    FROM asignatura, alumno, alumno_asignatura
+    WHERE alumno_asignatura.alumno = ?
+    AND asignatura.id = alumno_asignatura.asignatura
+    AND alumno.id = alumno_asignatura.alumno;`;
+
+  db.query(queryAsignaturasMatriculadas, [alumnoId], (err, result) => {
+    if (err) res.render('error', { mensaje: err });
+    else {
+      const asignaturas = result;
+      db.query('select * from alumno where alumno.id=?', [alumnoId], (err, result) => {
+        if (err) res.render('error', { mensaje: err });
+        else
+          res.render('asignaturas-alumno', { alumno: result[0], asignaturasMatriculadas: asignaturas });
+      });
+    }
+  });
+});
+  
+// Rutas
+app.get('/matricular', (req, res) => {
+    // Obtener lista de alumnos y asignaturas
+    const queryAlumnos = 'SELECT * FROM alumno';
+    const queryAsignaturas = 'SELECT * FROM asignatura';
+  
+    db.query(queryAlumnos, (errAlumnos, resultAlumnos) => {
+      if (errAlumnos) throw errAlumnos;
+  
+      db.query(queryAsignaturas, (errAsignaturas, resultAsignaturas) => {
+        if (errAsignaturas) throw errAsignaturas;
+  
+        res.render('matriculas', {
+          alumnos: resultAlumnos,
+          asignaturas: resultAsignaturas,
+        });
+      });
+    });
+  });
+  
+  app.post('/matricular', (req, res) => {
+    const { alumno, asignatura } = req.body;
+  
+    // Verificar si la matrícula ya existe
+    const queryExistencia = 'SELECT * FROM alumno_asignatura WHERE alumno = ? AND asignatura = ?';
+    
+    db.query(queryExistencia, [alumno, asignatura], (errExistencia, resultExistencia) => {
+      if (errExistencia) throw errExistencia;
+  
+      if (resultExistencia.length === 0) {
+        // Matricular al alumno en la asignatura
+        const queryMatricular = 'INSERT INTO alumno_asignatura (alumno, asignatura) VALUES (?, ?)';
+        
+        db.query(queryMatricular, [alumno, asignatura], (errMatricular) => {
+          if (errMatricular) throw errMatricular;
+  
+          res.redirect('/matricular');
+        });
+      } else {
+        // Matrícula ya existe
+        res.render('error', { mensaje: 'La matrícula ya existe' });
+      }
+    });
+  });
+  
+  app.get('/asignaturas/:alumnoId', (req, res) => {
+    const alumnoId = req.params.alumnoId;
+  
+    // Obtener asignaturas matriculadas para el alumno seleccionado
+    const queryAsignaturasMatriculadas = `
+      SELECT asignatura.nombre as asignatura, alumno.*
+      FROM asignatura, alumno, alumno_asignatura
+      WHERE alumno_asignatura.alumno = ?
+      AND asignatura.id = alumno_asignatura.asignatura
+      AND alumno.id = alumno_asignatura.alumno;`;
+  
+    db.query(queryAsignaturasMatriculadas, [alumnoId], (err, result) => {
+      if (err) res.render('error', { mensaje: err });
+      else {
+        const asignaturas = result;
+        db.query('select * from alumno where alumno.id=?', [alumnoId], (err, result) => {
+          if (err) res.render('error', { mensaje: err });
+          else
+            res.render('asignaturas-alumno', { alumno: result[0], asignaturasMatriculadas: asignaturas });
+        });
+      }
+    });
+  });
+  
 
 // Iniciar el servidor
 app.listen(port, () => {

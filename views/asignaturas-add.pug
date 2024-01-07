@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1 Agregar Asignatura
+  form(action='/asignaturas-add', method='post')
+    label(for='nombre') Nombre:
+    input(type='text', id='nombre', name='nombre', required=true)
+    label(for='curso') Curso:
+    input(type='text', id='curso', name='curso', required=true)
+    label(for='ciclo') Ciclo:
+    input(type='text', id='ciclo', name='ciclo', required=true)
+    br
+    button(type='submit') Agregar Asignatura
+    br
+    a(href='/asignaturas') Volver a la Lista

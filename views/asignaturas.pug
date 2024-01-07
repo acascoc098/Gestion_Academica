@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h1 Lista de Asignaturas
+  table
+    thead
+      tr
+        th ID
+        th Nombre
+        th Ciclo
+        th Curso
+    tbody
+      each asignatura in asignaturas
+        tr
+          td= asignatura.id
+          td= asignatura.nombre
+          td= asignatura.ciclo
+          td= asignatura.curso
+          td
+            a(href=`/asignaturas-edit/${asignatura.id}`) Editar
+            span |
+            a(href=`/asignaturas-delete/${asignatura.id}`) Eliminar
+  p
+    a(href='/asignaturas-add') Agregar Nueva Asignatura

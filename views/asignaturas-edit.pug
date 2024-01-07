@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1 Editar Asignatura
+  form(action=`/asignaturas-edit/${asignatura.id}`, method='post')
+    br
+    label(for='nombre') Nombre:
+    input.form-control(type='text', id='nombre', name='nombre', value=asignatura.nombre, required=true)
+    br
+    label(for='curso') Curso:
+    input.form-control(type='text', id='curso', name='curso', value=asignatura.curso, required=true)
+    br
+    label(for='curso') Ciclo:
+    input.form-control(type='text', id='ciclo', name='ciclo', value=asignatura.ciclo, required=true)
+    br
+    button.btn.btn-primary(type='submit') Guardar Cambios
+    br
+    a(href='/asignaturas') Volver a la Lista
